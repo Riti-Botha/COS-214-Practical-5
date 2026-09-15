@@ -2,6 +2,12 @@
 #include <iostream>
 #include <string>
 
+void Incident::printStatus() const {
+    if (state) {
+        state->printStatus();
+    }
+}
+
 // context
 Incident::Incident(IncidentState* initialState) : state(initialState) {}
 
