@@ -22,6 +22,7 @@ public:
     void setState(IncidentState* newState);
     void dispatch();
     void resolve();
+    void printStatus() const;
 };
 
 // concrete states
