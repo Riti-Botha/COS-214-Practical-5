@@ -11,8 +11,7 @@
 #include "FacilitiesTeam.h"
 #include "SecurityTeam.h"
 #include "LockDownCommand.h"
-
-class LegacyAlertSystem {}; 
+#include "LegacyAlertSystem.h"
 
 int main() {
 
