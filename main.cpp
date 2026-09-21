@@ -12,6 +12,12 @@
 #include "SecurityTeam.h"
 #include "LockDownCommand.h"
 #include "LegalAlertSystem.h"
+#include "MedicalTeam.h"
+#include "OperatorConsole.h"
+#include "SecureAreaCommand.h"
+#include "DispatchUnitCommand.h"
+#include "CancelCommand.h"
+#include "OperatorCommand.h"
 
 int main() {
 
@@ -35,16 +41,36 @@ int main() {
     IncidentCoordinator* campusMediator = new IncidentCoordinator();
     FacilitiesTeam* facilities = new FacilitiesTeam("Maintenance Alpha", campusMediator);
     SecurityTeam* security = new SecurityTeam("Security Bravo", campusMediator);
+    MedicalTeam* medical = new MedicalTeam("Medic Team Bravo", campusMediator);
     
     // here we register the teams with the mediator so they can communicate
+    campusMediator->registerComponent(security);
+    campusMediator->registerComponent(facilities);
+    campusMediator->registerComponent(medical);
+    campusMediator->setSecurityTeam(security);
+    campusMediator->setFacilitiesTeam(facilities);
+    campusMediator->setMedicalTeam(medical);
+
     LegacyAlertSystem* oldAlarm = new LegacyAlertSystem();
     AlertService* campusAlarm = new LegacyAlertAdapter(oldAlarm);
+
+    // COMMAND + MEDIATOR "Zone secured ripple"
+    // security is sent to secure the Chemistry Wing. The operator wraps
+    // this in a SecureAreaCommand and issues it through the console (Invoker).
+    // Console.execute() -> Command -> Security.secureArea(area) -> the team
+    // notifies the mediator, which ripples the event out to Facilities
+    // (lockArea) and Medical (dispatch) -- Security never talks to either
+    // of them directly.
+    OperatorConsole* console = new OperatorConsole();
+    OperatorCommand* secureZone = new SecureAreaCommand(security, "Chemistry Wing");
+    console->issueCommand(secureZone);
+    std::cout << "\n";
 
     // command
     // Story: The operator needs to lock down the Science Lab to prevent students from entering.
     // They wrap this request into a LockdownCommand object. This decouples the operator 
     // from the Facilities Team, allowing the command to be passed around or delayed if needed.
-    OperatorCommand* lockLab = new LockdownCommand(facilities, "Science Lab");
+    OperatorCommand* lockLab = new LockDownCommand(facilities, "Science Lab");
 
     // FACADE
     // In a massive emergency, the operator doesn't have time to manually ring the alarm, 
@@ -56,6 +82,17 @@ int main() {
     
     emergencySystem->activateEmergencyProtocol("Science Lab", lockLab);
     std::cout << "\n";
+
+    // COMMAND: undo via a Command whose receiver is another Command.
+    // The Science Lab is confirmed safe, so the operator lifts the
+    // lockdown by issuing a CancelCommand wrapped around the original
+    // lockLab command. CancelCommand::execute() calls lockLab->undo(),
+    // which calls facilities->unlockArea("Science Lab").
+    OperatorCommand* cancelLockLab = new CancelCommand(lockLab);
+    console->issueCommand(cancelLockLab);
+    std::cout << "\n";
+
+    std::cout << "[OperatorConsole] " << console->historySize() << " commands issued; last was: " << console->getLastCommand()->getDescription() << "\n\n";
 
     // STATE UPDATE
     // Now that the Facade has successfully deployed the teams and locked the doors,
@@ -78,8 +115,10 @@ int main() {
     delete emergencySystem;
     delete campusAlarm;
     delete oldAlarm;
+    delete console;
     delete facilities;
     delete security;
+    delete medical;
     delete campusMediator;
 
     return 0;
