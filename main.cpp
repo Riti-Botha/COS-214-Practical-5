@@ -81,6 +81,23 @@ int main() {
     delete facilities;
     delete security;
     delete campusMediator;
+    //  ADAPTER TEST: unmapped location 
+    // The adapter's zone lookup table only knows specific locations.
+    // This proves the adapter fails safely rather than crashing or
+    // silently pretending to send an alert it never could.
+    std::cout << "\n########## ADAPTER TEST: Unknown Location ##########\n" << std::endl;
+    bool badAlert = campusAlarm->sendAlert("Parking Lot Z", "TEST ALERT");
+    std::cout << "Result: " << (badAlert ? "sent" : "rejected as expected") << "\n" << std::endl;
+
+    //  FACADE TEST: unavailable component
+    // Simulates a security team already dispatched elsewhere, to show
+    // the facade aborts the whole protocol rather than partially running it.
+    std::cout << "\n########## FACADE TEST: Unavailable Team ##########\n" << std::endl;
+    security->dispatch("Other Incident");   // marks it unavailable, if your dispatch() does that
+    OperatorCommand* secondLock = new LockdownCommand(facilities, "Library Quad");
+    bool protocolResult = emergencySystem->activateEmergencyProtocol("Library Quad", secondLock);
+    std::cout << "Protocol result: " << (protocolResult ? "succeeded" : "aborted as expected") << "\n" << std::endl;
+    delete secondLock;
 
     return 0;
 }
