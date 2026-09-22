@@ -140,7 +140,59 @@ int main() {
     delete security;
     delete medical;
     delete campusMediator;
-    
+
+    // DON'T DELETE - STORY 2 (Command + Mediator)
+    // Fire alarm in the Engineering building. An operator dispatches
+    // security through the console (Command/Invoker). Security secures
+    // the zone, which ripples through the mediator to auto-lock
+    // facilities and dispatch medical without security knowing about
+    // either of them directly. An explicit lockdown and a cancel close
+    // out the story.
+
+    IncidentCoordinator* engMediator = new IncidentCoordinator();
+    SecurityTeam* engSecurity = new SecurityTeam("Security Charlie", engMediator);
+    MedicalTeam* engMedical = new MedicalTeam("Medic Team Delta", engMediator);
+    FacilitiesTeam* engFacilities = new FacilitiesTeam("Maintenance Echo", engMediator);
+
+    // wire the colleagues into the mediator so notify() can reach them
+    engMediator->registerComponent(engSecurity);
+    engMediator->registerComponent(engMedical);
+    engMediator->registerComponent(engFacilities);
+    engMediator->setSecurityTeam(engSecurity);
+    engMediator->setMedicalTeam(engMedical);
+    engMediator->setFacilitiesTeam(engFacilities);
+
+    OperatorConsole* engconsole = new OperatorConsole();
+
+    // 1) operator dispatches security to the building
+    OperatorCommand* dispatchSecurity = new DispatchUnitCommand(engSecurity, "Engineering Building");
+    engconsole->issueCommand(dispatchSecurity);
+    std::cout << "\n";
+
+    // 2) security secures the zone -> notifyMediator("ZoneSecured", event, loc)
+    //    IncidentCoordinator::notify() ripples to facilities (lockArea) and medical (dispatch)
+    OperatorCommand* secureZone = new SecureAreaCommand(engSecurity, "Engineering Building");
+    engconsole->issueCommand(secureZone);
+    std::cout << "\n";
+
+    // 3) explicit lockdown of a specific room via Facilities directly
+    OperatorCommand* lockServerRoom = new LockDownCommand(engFacilities, "Engineering Server Room");
+    engconsole->issueCommand(lockServerRoom);
+    std::cout << "\n";
+
+    // 4) cancel the server room lockdown (Command whose receiver is another Command)
+    OperatorCommand* cancelLockdown = new CancelCommand(lockServerRoom);
+    engconsole->issueCommand(cancelLockdown);
+    std::cout << "\n";
+
+    std::cout << "[OperatorConsole] " << engconsole->historySize() << " commands issued; last was: " << engconsole->getLastCommand()->getDescription() << "\n\n";
+
+    // console owns every command it was issued and deletes them on destruction
+    delete engconsole;
+    delete engFacilities;
+    delete engMedical;
+    delete engSecurity;
+    delete engMediator;
 
     return 0;
 }
