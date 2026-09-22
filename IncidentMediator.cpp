@@ -1,5 +1,5 @@
-#include"IncidentMediatior.h"
+#include "IncidentMediator.h"
 
-IncidentMediatior::~IncidentMediatior(){
+IncidentMediator::~IncidentMediator(){
     
 }
