@@ -3,7 +3,7 @@
 #include <iostream>
 
 namespace{
-    truct ZoneEntry { const char* name; int code; };
+    struct ZoneEntry { const char* name; int code; };
     const ZoneEntry ZONES[] = {
         {"Library Quad", 1},
         {"Engineering Block", 2},
