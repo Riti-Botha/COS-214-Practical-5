@@ -70,7 +70,27 @@ int main() {
     chemicalSpill->printStatus();
     std::cout << "\n";
 
+     // ADAPTER 
+    std::cout << "\n########## ADAPTER TEST: Direct sendAlert calls ##########\n" << std::endl;
 
+    // Branch 1: zone mapped -> reaches LegacyAlertSystem, returns true
+    bool goodAlert = campusAlarm->sendAlert("Science Lab", "LOCKDOWN in effect");
+    std::cout << "Mapped zone result: " << (goodAlert ? "sent" : "unexpectedly rejected") << "\n" << std::endl;
+
+    // Branch 2: zone unmapped -> never reaches LegacyAlertSystem, returns false
+    bool badAlert = campusAlarm->sendAlert("Parking Lot Z", "TEST ALERT");
+    std::cout << "Unmapped zone result: " << (badAlert ? "unexpectedly sent" : "rejected as expected") << "\n" << std::endl;
+
+    //  FACADE TEST: unavailable component
+    // Simulates a security team already dispatched elsewhere, to show
+    // the facade aborts the whole protocol rather than partially running it.
+    std::cout << "\n########## FACADE TEST: Unavailable Team ##########\n" << std::endl;
+    security->dispatch("Other Incident");   // marks it unavailable, if your dispatch() does that
+    OperatorCommand* secondLock = new LockdownCommand(facilities, "Library Quad");
+    bool protocolResult = emergencySystem->activateEmergencyProtocol("Library Quad", secondLock);
+    std::cout << "Protocol result: " << (protocolResult ? "succeeded" : "aborted as expected") << "\n" << std::endl;
+
+    delete secondLock;
     delete chemicalSpill;
     delete extraMedic;
     delete medicalDepot;        
@@ -81,23 +101,7 @@ int main() {
     delete facilities;
     delete security;
     delete campusMediator;
-    //  ADAPTER TEST: unmapped location 
-    // The adapter's zone lookup table only knows specific locations.
-    // This proves the adapter fails safely rather than crashing or
-    // silently pretending to send an alert it never could.
-    std::cout << "\n########## ADAPTER TEST: Unknown Location ##########\n" << std::endl;
-    bool badAlert = campusAlarm->sendAlert("Parking Lot Z", "TEST ALERT");
-    std::cout << "Result: " << (badAlert ? "sent" : "rejected as expected") << "\n" << std::endl;
-
-    //  FACADE TEST: unavailable component
-    // Simulates a security team already dispatched elsewhere, to show
-    // the facade aborts the whole protocol rather than partially running it.
-    std::cout << "\n########## FACADE TEST: Unavailable Team ##########\n" << std::endl;
-    security->dispatch("Other Incident");   // marks it unavailable, if your dispatch() does that
-    OperatorCommand* secondLock = new LockdownCommand(facilities, "Library Quad");
-    bool protocolResult = emergencySystem->activateEmergencyProtocol("Library Quad", secondLock);
-    std::cout << "Protocol result: " << (protocolResult ? "succeeded" : "aborted as expected") << "\n" << std::endl;
-    delete secondLock;
+    
 
     return 0;
 }
