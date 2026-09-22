@@ -5,6 +5,7 @@ class ResponseComponent;
 class ResponseUnitFactory;
 class AlertService;
 class OperatorCommand;
+#include <string>
 
 class EmergencyProtocolFacade {
     private:
