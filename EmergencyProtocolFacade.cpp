@@ -9,7 +9,7 @@ EmergencyProtocolFacade::EmergencyProtocolFacade(ResponseComponent* security, Re
 
 EmergencyProtocolFacade::~EmergencyProtocolFacade(){}
 
-bool EmergencyProtocolFacade::activateEmergencyProtocol((const std::string& location, OperatorCommand* lockdownCommand){
+bool EmergencyProtocolFacade::activateEmergencyProtocol(const std::string& location, OperatorCommand* lockdownCommand){
     std::cout << "\n=== EMERGENCY PROTOCOL: " << location << " ===" << std::endl;
     if(!security->isAvailable()){
         std::cout << "[Facade] " << security->getName() << " unavailable - protocol aborted." << std::endl;
