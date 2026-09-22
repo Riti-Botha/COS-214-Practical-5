@@ -3,7 +3,7 @@
 #include "AlertService.h"
 #include <string>
 
-class LegacyAlertSystem;
+class LegalAlertSystem;
 class LegacyAlertAdapter : public AlertService {
     private:
         LegacyAlertSystem* legacy;                       // owned

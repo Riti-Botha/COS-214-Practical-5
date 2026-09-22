@@ -1,5 +1,5 @@
 #include "LegacyAlertAdapter.h"
-#include "LegacyAlertSystem.h"
+#include "LegalAlertSystem.h"
 #include <iostream>
 
 namespace{

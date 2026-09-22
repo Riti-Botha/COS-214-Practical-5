@@ -97,7 +97,6 @@ int main() {
     delete lockLab;
     delete emergencySystem;
     delete campusAlarm;
-    delete oldAlarm;
     delete facilities;
     delete security;
     delete campusMediator;
