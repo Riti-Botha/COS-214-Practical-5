@@ -12,10 +12,10 @@ int LegalAlertSystem::broadcastToZone(int zoneCode, int severityLevel, const cha
     if(zoneCode <= 0 || zoneCode > zoneCount()){
         return LEGACY_BAD_ZONE;
     }
-    std::cout << "[LEGACY SYSTEM] zone = " << zoneCode << "severity = " << severityLevel << "msg=\" << payload << "\"" << std::endl;
+    std::cout << "[LEGACY SYSTEM] zone = " << zoneCode << "severity = " << severityLevel << "msg=\"" << payload << "\"" << std::endl;
     return LEGACY_OK;
 }
 
-int LegacyAlertSystem::zoneCount()const{
+int LegalAlertSystem::zoneCount()const{
     return 4;
 }
