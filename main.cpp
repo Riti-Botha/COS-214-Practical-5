@@ -12,6 +12,12 @@
 #include "SecurityTeam.h"
 #include "LockDownCommand.h"
 #include "LegalAlertSystem.h"
+#include "MedicalTeam.h"
+#include "OperatorConsole.h"
+#include "SecureAreaCommand.h"
+#include "DispatchUnitCommand.h"
+#include "CancelCommand.h"
+#include "OperatorCommand.h"
 
 int main() {
 
@@ -35,16 +41,36 @@ int main() {
     IncidentCoordinator* campusMediator = new IncidentCoordinator();
     FacilitiesTeam* facilities = new FacilitiesTeam("Maintenance Alpha", campusMediator);
     SecurityTeam* security = new SecurityTeam("Security Bravo", campusMediator);
+    MedicalTeam* medical = new MedicalTeam("Medic Team Bravo", campusMediator);
     
     // here we register the teams with the mediator so they can communicate
+    campusMediator->registerComponent(security);
+    campusMediator->registerComponent(facilities);
+    campusMediator->registerComponent(medical);
+    campusMediator->setSecurityTeam(security);
+    campusMediator->setFacilitiesTeam(facilities);
+    campusMediator->setMedicalTeam(medical);
+
     LegacyAlertSystem* oldAlarm = new LegacyAlertSystem();
     AlertService* campusAlarm = new LegacyAlertAdapter(oldAlarm);
+
+    // COMMAND + MEDIATOR "Zone secured ripple"
+    // security is sent to secure the Chemistry Wing. The operator wraps
+    // this in a SecureAreaCommand and issues it through the console (Invoker).
+    // Console.execute() -> Command -> Security.secureArea(area) -> the team
+    // notifies the mediator, which ripples the event out to Facilities
+    // (lockArea) and Medical (dispatch) -- Security never talks to either
+    // of them directly.
+    OperatorConsole* console = new OperatorConsole();
+    OperatorCommand* secureZone = new SecureAreaCommand(security, "Chemistry Wing");
+    console->issueCommand(secureZone);
+    std::cout << "\n";
 
     // command
     // Story: The operator needs to lock down the Science Lab to prevent students from entering.
     // They wrap this request into a LockdownCommand object. This decouples the operator 
     // from the Facilities Team, allowing the command to be passed around or delayed if needed.
-    OperatorCommand* lockLab = new LockdownCommand(facilities, "Science Lab");
+    OperatorCommand* lockLab = new LockDownCommand(facilities, "Science Lab");
 
     // FACADE
     // In a massive emergency, the operator doesn't have time to manually ring the alarm, 
@@ -56,6 +82,17 @@ int main() {
     
     emergencySystem->activateEmergencyProtocol("Science Lab", lockLab);
     std::cout << "\n";
+
+    // COMMAND: undo via a Command whose receiver is another Command.
+    // The Science Lab is confirmed safe, so the operator lifts the
+    // lockdown by issuing a CancelCommand wrapped around the original
+    // lockLab command. CancelCommand::execute() calls lockLab->undo(),
+    // which calls facilities->unlockArea("Science Lab").
+    OperatorCommand* cancelLockLab = new CancelCommand(lockLab);
+    console->issueCommand(cancelLockLab);
+    std::cout << "\n";
+
+    std::cout << "[OperatorConsole] " << console->historySize() << " commands issued; last was: " << console->getLastCommand()->getDescription() << "\n\n";
 
     // STATE UPDATE
     // Now that the Facade has successfully deployed the teams and locked the doors,
@@ -97,10 +134,68 @@ int main() {
     delete lockLab;
     delete emergencySystem;
     delete campusAlarm;
+<<<<<<< HEAD
+=======
+    delete oldAlarm;
+    delete console;
+>>>>>>> b818670abfb21636e2312800349fd8de58e8a64f
     delete facilities;
     delete security;
+    delete medical;
     delete campusMediator;
-    
+
+    // DON'T DELETE - STORY 2 (Command + Mediator)
+    // Fire alarm in the Engineering building. An operator dispatches
+    // security through the console (Command/Invoker). Security secures
+    // the zone, which ripples through the mediator to auto-lock
+    // facilities and dispatch medical without security knowing about
+    // either of them directly. An explicit lockdown and a cancel close
+    // out the story.
+
+    IncidentCoordinator* engMediator = new IncidentCoordinator();
+    SecurityTeam* engSecurity = new SecurityTeam("Security Charlie", engMediator);
+    MedicalTeam* engMedical = new MedicalTeam("Medic Team Delta", engMediator);
+    FacilitiesTeam* engFacilities = new FacilitiesTeam("Maintenance Echo", engMediator);
+
+    // wire the colleagues into the mediator so notify() can reach them
+    engMediator->registerComponent(engSecurity);
+    engMediator->registerComponent(engMedical);
+    engMediator->registerComponent(engFacilities);
+    engMediator->setSecurityTeam(engSecurity);
+    engMediator->setMedicalTeam(engMedical);
+    engMediator->setFacilitiesTeam(engFacilities);
+
+    OperatorConsole* engconsole = new OperatorConsole();
+
+    // 1) operator dispatches security to the building
+    OperatorCommand* dispatchSecurity = new DispatchUnitCommand(engSecurity, "Engineering Building");
+    engconsole->issueCommand(dispatchSecurity);
+    std::cout << "\n";
+
+    // 2) security secures the zone -> notifyMediator("ZoneSecured", event, loc)
+    //    IncidentCoordinator::notify() ripples to facilities (lockArea) and medical (dispatch)
+    OperatorCommand* secureZone = new SecureAreaCommand(engSecurity, "Engineering Building");
+    engconsole->issueCommand(secureZone);
+    std::cout << "\n";
+
+    // 3) explicit lockdown of a specific room via Facilities directly
+    OperatorCommand* lockServerRoom = new LockDownCommand(engFacilities, "Engineering Server Room");
+    engconsole->issueCommand(lockServerRoom);
+    std::cout << "\n";
+
+    // 4) cancel the server room lockdown (Command whose receiver is another Command)
+    OperatorCommand* cancelLockdown = new CancelCommand(lockServerRoom);
+    engconsole->issueCommand(cancelLockdown);
+    std::cout << "\n";
+
+    std::cout << "[OperatorConsole] " << engconsole->historySize() << " commands issued; last was: " << engconsole->getLastCommand()->getDescription() << "\n\n";
+
+    // console owns every command it was issued and deletes them on destruction
+    delete engconsole;
+    delete engFacilities;
+    delete engMedical;
+    delete engSecurity;
+    delete engMediator;
 
     return 0;
 }
