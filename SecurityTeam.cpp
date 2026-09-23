@@ -23,7 +23,7 @@ void SecurityTeam::secureArea(const std::string& area){
 
 void SecurityTeam::reopenArea(const std::string& area){
     if(securedArea == area){
-        secureArea = "";
+        securedArea= "";
         std::cout << "[Security] " << name << " has reopened " << area << " (undo)" << std::endl;
     }
     else{
