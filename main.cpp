@@ -170,7 +170,6 @@ int main() {
 
     // 2) security secures the zone -> notifyMediator("ZoneSecured", event, loc)
     //    IncidentCoordinator::notify() ripples to facilities (lockArea) and medical (dispatch)
-    OperatorCommand* secureZone = new SecureAreaCommand(engSecurity, "Engineering Building");
     engconsole->issueCommand(secureZone);
     std::cout << "\n";
 

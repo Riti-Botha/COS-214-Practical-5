@@ -2,7 +2,7 @@
 #include"SecureAreaCommand.h"
 #include"SecurityTeam.h"
 
-SecureAreaCommand::SecureAreaCommand(Security* receiver, const std::string& area) : receiver(receiver), area(area), secured(false){
+SecureAreaCommand::SecureAreaCommand(SecurityTeam* receiver, const std::string& area) : receiver(receiver), area(area), secured(false){
 
 }
 

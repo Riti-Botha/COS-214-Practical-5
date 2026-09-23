@@ -9,7 +9,7 @@ IncidentCoordinator::IncidentCoordinator() : security(nullptr), medical(nullptr)
 
 }
 
-IncidentCoordinator::~IncidentCoordinator{
+IncidentCoordinator::~IncidentCoordinator(){
 
 }
 
