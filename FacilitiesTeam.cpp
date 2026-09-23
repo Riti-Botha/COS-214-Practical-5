@@ -21,7 +21,7 @@ void FacilitiesTeam::lockArea(const std::string& area){
 }
 
 void FacilitiesTeam::unlockArea(const std::string& area){
-    if(lockedArea_ == area){
+    if(lockedArea == area){
         lockedArea = "";
         std::cout << "[Facilities] " << name << " has unlocked " << area << std::endl;
     } 

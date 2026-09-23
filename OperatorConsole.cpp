@@ -8,7 +8,7 @@ OperatorConsole::OperatorConsole(){
 }
 
 OperatorConsole::~OperatorConsole(){
-    for(std::vector<OperatorCommand*>::iterator it = history.begin(); it != history.end; it++){
+    for(std::vector<OperatorCommand*>::iterator it = history.begin(); it != history.end(); it++){
         delete *it;
     }
 

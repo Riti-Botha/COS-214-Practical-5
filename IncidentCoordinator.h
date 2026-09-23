@@ -17,7 +17,7 @@ class IncidentCoordinator : public IncidentMediator{
 
     public:
         IncidentCoordinator();
-        ~IncidentCoordinator() override;
+        ~IncidentCoordinator();
         void registerComponent(ResponseComponent* component) override;
         void notify(ResponseComponent* sender, const std::string& event, const std::string& location) override;
         void setSecurityTeam(SecurityTeam* team);
