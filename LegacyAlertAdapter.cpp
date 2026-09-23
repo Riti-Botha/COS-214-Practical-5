@@ -13,7 +13,7 @@ namespace{
     const int ZONE_COUNT = 4;
 }
 
-LegacyAlertAdapter::LegacyAlertAdapter(LegacyAlertSystem* legacySystem) : legacy(legacySystem){}
+LegacyAlertAdapter::LegacyAlertAdapter(LegalAlertSystem* legacySystem) : legacy(legacySystem){}
 
 LegacyAlertAdapter::~LegacyAlertAdapter(){
     if(legacy != nullptr){
@@ -44,7 +44,7 @@ bool LegacyAlertAdapter::sendAlert(const std::string& location, const std::strin
     }
     int status = legacy->broadcastToZone(zone, severityFor(message), message.c_str());
 
-    if (status != LegacyAlertSystem::LEGACY_OK) {
+    if (status != LegalAlertSystem::LEGACY_OK) {
         std::cout << "[Adapter] Legacy system rejected broadcast (code " << status << ")." << std::endl;
         return false;
     }

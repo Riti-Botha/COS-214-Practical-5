@@ -74,7 +74,7 @@ int main() {
     std::cout << "\n########## ADAPTER TEST: Direct sendAlert calls ##########\n" << std::endl;
 
     // Branch 1: zone mapped -> reaches LegacyAlertSystem, returns true
-    bool goodAlert = campusAlarm->sendAlert("Science Lab", "LOCKDOWN in effect");
+    bool goodAlert = campusAlarm->sendAlert("Library Quad", "LOCKDOWN in effect");
     std::cout << "Mapped zone result: " << (goodAlert ? "sent" : "unexpectedly rejected") << "\n" << std::endl;
 
     // Branch 2: zone unmapped -> never reaches LegacyAlertSystem, returns false

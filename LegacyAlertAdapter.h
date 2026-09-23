@@ -6,13 +6,13 @@
 class LegalAlertSystem;
 class LegacyAlertAdapter : public AlertService {
     private:
-        LegacyAlertSystem* legacy;                       // owned
+        LegalAlertSystem* legacy;                       // owned
 
         int zoneFor(const std::string& location) const;
         int severityFor(const std::string& message) const;
 
     public:
-        LegacyAlertAdapter(LegacyAlertSystem* legacySystem);
+        LegacyAlertAdapter(LegalAlertSystem* legacySystem);
         virtual ~LegacyAlertAdapter();
 
         virtual bool sendAlert(const std::string& location, const std::string& message);
