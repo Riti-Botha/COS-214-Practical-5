@@ -51,7 +51,7 @@ int main() {
     campusMediator->setFacilitiesTeam(facilities);
     campusMediator->setMedicalTeam(medical);
 
-    LegacyAlertSystem* oldAlarm = new LegacyAlertSystem();
+    LegalAlertSystem* oldAlarm = new LegalAlertSystem();
     AlertService* campusAlarm = new LegacyAlertAdapter(oldAlarm);
 
     // COMMAND + MEDIATOR "Zone secured ripple"
@@ -123,7 +123,7 @@ int main() {
     // the facade aborts the whole protocol rather than partially running it.
     std::cout << "\n########## FACADE TEST: Unavailable Team ##########\n" << std::endl;
     security->dispatch("Other Incident");   // marks it unavailable, if your dispatch() does that
-    OperatorCommand* secondLock = new LockdownCommand(facilities, "Library Quad");
+    OperatorCommand* secondLock = new LockDownCommand(facilities, "Library Quad");
     bool protocolResult = emergencySystem->activateEmergencyProtocol("Library Quad", secondLock);
     std::cout << "Protocol result: " << (protocolResult ? "succeeded" : "aborted as expected") << "\n" << std::endl;
 
@@ -134,11 +134,7 @@ int main() {
     delete lockLab;
     delete emergencySystem;
     delete campusAlarm;
-<<<<<<< HEAD
-=======
-    delete oldAlarm;
     delete console;
->>>>>>> b818670abfb21636e2312800349fd8de58e8a64f
     delete facilities;
     delete security;
     delete medical;
