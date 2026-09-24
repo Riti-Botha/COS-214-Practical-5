@@ -170,7 +170,8 @@ int main() {
 
     // 2) security secures the zone -> notifyMediator("ZoneSecured", event, loc)
     //    IncidentCoordinator::notify() ripples to facilities (lockArea) and medical (dispatch)
-    engconsole->issueCommand(secureZone);
+   OperatorCommand* engSecureZone = new SecureAreaCommand(engSecurity, "Engineering Building");
+   engconsole->issueCommand(engSecureZone);
     std::cout << "\n";
 
     // 3) explicit lockdown of a specific room via Facilities directly
